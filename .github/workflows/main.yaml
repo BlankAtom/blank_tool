@@ -47,7 +47,7 @@ jobs:
           channel: 'stable'
 
       - name: Build for linux
-        run: flutter build linux --release --cpp-compiler g++
+        run: flutter build linux --release
 
       - name: Install zip
         run: sudo apt-get install zip
