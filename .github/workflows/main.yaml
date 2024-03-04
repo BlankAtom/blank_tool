@@ -3,7 +3,7 @@ name: Test, Build and Release Windows
 jobs:
   build:
     name: Build Windows
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
       #      - uses: actions/setup-java@v1
