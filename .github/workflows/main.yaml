@@ -1,26 +1,82 @@
-on: push
+on:
+  push:
+    branches:
+      - main
+
+#  push:
+#    # Sequence of patterns matched against refs/tags
+#    tags:
+#      - "v*" # Push events to matching v*, i.e. v1.0, v20.15.10
+
 name: Test, Build and Release Windows
 jobs:
-  build:
+  build-on-windows:
     name: Build Windows
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      #      - uses: actions/setup-java@v1
-      #        with:
-      #          java-version: '12.x'
-      - uses: subosito/flutter-action@v2
+      - name: Checkout git repository
+        uses: actions/checkout@v4
+
+      - name: Flutter environment be preparing
+        uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
-      - run: flutter build windows
+
+      - name: Build for windows
+        run: flutter build windows
+
+      - name: Compress build result
+        run: Compress-Archive -Path 'build/windows/x64/runner/Release' -DestinationPath 'windows-build.zip'
+
       - name: Save build result
         uses: actions/upload-artifact@v4
         with:
-          name: windows-build
-          path: build/windows/x64/runner/Release
+          name: windows-build.zip
+          path: windows-build.zip
 
-#      - name: Push APK to Releases
-#        uses: ncipollo/release-action@v1
-#        with:
-#          artifacts: "build/app/outputs/apk/debug/*.apk"
-#          token: ${{ secrets.TOKEN }}
+  build-on-linux:
+    name: Build Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout git repository
+        uses: actions/checkout@v4
+
+      - name: Flutter environment be preparing
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+
+      - name: Build for linux
+        run: flutter build linux
+
+      - name: Install zip
+        run: sudo apt-get install zip
+
+      - name: Compress files
+        run: |
+          zip -r linux-ubuntu-build.zip build/linux/x64/runner/Release
+
+      - name: Save build result
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-ubuntu-build.zip
+          path: linux-ubuntu-build.zip
+
+  release-preview:
+    needs:
+      - build-on-windows
+      - build-on-linux
+
+    name: Release preview
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+
+      - name: Create Release & Upload Windows Build
+        id: upload_release_asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            linux-ubuntu-build.zip
+            windows-build.zip
