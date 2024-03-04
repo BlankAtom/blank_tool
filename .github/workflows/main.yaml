@@ -34,38 +34,37 @@ jobs:
           name: windows-build.zip
           path: windows-build.zip
 
-  build-on-linux:
-    name: Build Linux
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout git repository
-        uses: actions/checkout@v4
-
-      - name: Flutter environment be preparing
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
-      - name: Build for linux
-        run: flutter build linux
-
-      - name: Install zip
-        run: sudo apt-get install zip
-
-      - name: Compress files
-        run: |
-          zip -r linux-ubuntu-build.zip build/linux/x64/runner/Release
-
-      - name: Save build result
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-ubuntu-build.zip
-          path: linux-ubuntu-build.zip
+  #  build-on-linux:
+  #    name: Build Linux
+  #    runs-on: ubuntu-latest
+  #    steps:
+  #      - name: Checkout git repository
+  #        uses: actions/checkout@v4
+  #
+  #      - name: Flutter environment be preparing
+  #        uses: subosito/flutter-action@v2
+  #        with:
+  #          channel: 'stable'
+  #
+  #      - name: Build for linux
+  #        run: flutter build linux
+  #
+  #      - name: Install zip
+  #        run: sudo apt-get install zip
+  #
+  #      - name: Compress files
+  #        run: |
+  #          zip -r linux-ubuntu-build.zip build/linux/x64/runner/Release
+  #
+  #      - name: Save build result
+  #        uses: actions/upload-artifact@v4
+  #        with:
+  #          name: linux-ubuntu-build.zip
+  #          path: linux-ubuntu-build.zip
 
   release-preview:
     needs:
       - build-on-windows
-      - build-on-linux
 
     name: Release preview
     runs-on: ubuntu-latest
