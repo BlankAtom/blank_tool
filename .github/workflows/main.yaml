@@ -13,6 +13,12 @@ jobs:
         with:
           channel: 'stable'
       - run: flutter build windows
+      - name: Save build result
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build
+          path: build/windows/x64/runner/Release
+
 #      - name: Push APK to Releases
 #        uses: ncipollo/release-action@v1
 #        with:
